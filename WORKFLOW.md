@@ -44,14 +44,14 @@ git push origin main
 
 - [ ] Gitee 已成功接收 `main` 分支。
 - [ ] Gitee → GitHub 镜像同步成功。
-- [ ] Gitee Pages 已更新并能打开原文。
+- [ ] Gitee 原文链接已可访问。
 - [ ] 再发布到 CSDN，随后同步掘金、麒麟论坛等平台。
 
 文末引用：
 
 ```markdown
-> 本文原文托管于 Gitee Pages：
-> https://digtip.gitee.io/notes/blog/<专题>/<文章文件名>
+> 本文原文托管于 Gitee：
+> https://gitee.com/digtip/notes/blob/main/blog/<专题>/<文章文件名>.md
 > 完整实操命令、配置与素材见仓库；GitHub 为只读镜像备份。
 ```
 
@@ -61,4 +61,4 @@ git push origin main
 - **写一章节**：`只扩写这篇文章的“操作步骤”章节，保留命令原样`
 - **准备定稿**：`检查事实待补项并更新专题目录，不提交`
 - **提交发布**：`展示本次变更摘要，经我确认后提交并推送 Gitee`
-- **检查发布**：`检查 Gitee、GitHub 镜像和 Pages 的发布状态`
+- **检查发布**：`检查 Gitee 原文和 GitHub 镜像的发布状态`
