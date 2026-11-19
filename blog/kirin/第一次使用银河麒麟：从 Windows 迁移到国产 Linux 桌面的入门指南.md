@@ -4,7 +4,7 @@ date: 2026-11-19
 tags: [银河麒麟, Linux, 信创, 新手入门, 桌面系统]
 description: 面向第一次接触银河麒麟的用户，系统讲解国产 Linux 桌面、终端、目录结构、权限、软件安装、AI 助手、常用命令和故障排查，帮助顺利完成从 Windows 到银河麒麟的过渡。
 status: published
-original: https://gitee.com/digtip/notes/blob/main/blog/kirin/第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南.md
+original: https://gitee.com/digtip/notes/blob/main/blog/kirin/%E7%AC%AC%E4%B8%80%E6%AC%A1%E4%BD%BF%E7%94%A8%E9%93%B6%E6%B2%B3%E9%BA%92%E9%BA%9F%EF%BC%9A%E4%BB%8E%20Windows%20%E8%BF%81%E7%A7%BB%E5%88%B0%E5%9B%BD%E4%BA%A7%20Linux%20%E6%A1%8C%E9%9D%A2%E7%9A%84%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97.md
 ---
 
 # 第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南
@@ -836,5 +836,5 @@ echo $?
 
 ---
 
-> 原文首发于 Gitee：<https://gitee.com/digtip/notes/blob/main/blog/kirin/第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南.md>
+> 原文首发于 Gitee：<https://gitee.com/digtip/notes/blob/main/blog/kirin/%E7%AC%AC%E4%B8%80%E6%AC%A1%E4%BD%BF%E7%94%A8%E9%93%B6%E6%B2%B3%E9%BA%92%E9%BA%9F%EF%BC%9A%E4%BB%8E%20Windows%20%E8%BF%81%E7%A7%BB%E5%88%B0%E5%9B%BD%E4%BA%A7%20Linux%20%E6%A1%8C%E9%9D%A2%E7%9A%84%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97.md>
 > 本文基于个人使用与培训材料整理，具体操作请以所用系统版本的官方文档和设备管理要求为准。
