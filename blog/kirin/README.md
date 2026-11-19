@@ -4,7 +4,7 @@
 
 ## 文章列表
 
-- [第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南](kylin-beginner-guide.md)（2026-11-19）
+- [第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南](第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南.md)（2026-11-19）
 
 ## 单篇结构
 

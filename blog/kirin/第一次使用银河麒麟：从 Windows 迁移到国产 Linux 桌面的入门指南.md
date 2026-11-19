@@ -4,7 +4,7 @@ date: 2026-11-19
 tags: [银河麒麟, Linux, 信创, 新手入门, 桌面系统]
 description: 面向第一次接触银河麒麟的用户，讲清系统定位、终端、目录结构、权限、软件安装与常用命令，帮助顺利完成从 Windows 到国产 Linux 桌面的过渡。
 status: published
-original: https://gitee.com/digtip/notes/blob/main/blog/kirin/kylin-beginner-guide.md
+original: https://gitee.com/digtip/notes/blob/main/blog/kirin/第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南.md
 ---
 
 # 第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南
@@ -185,5 +185,5 @@ AI 更适合成为解释器和辅助排障工具，最终执行决定仍应由�
 
 ---
 
-> 原文首发于 Gitee：<https://gitee.com/digtip/notes/blob/main/blog/kirin/kylin-beginner-guide.md>
+> 原文首发于 Gitee：<https://gitee.com/digtip/notes/blob/main/blog/kirin/第一次使用银河麒麟：从 Windows 迁移到国产 Linux 桌面的入门指南.md>
 > 本文基于个人使用与培训材料整理，具体操作请以所用系统版本的官方文档和单位管理要求为准。
