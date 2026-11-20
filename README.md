@@ -22,7 +22,7 @@
 
 ### AI 工具使用经验
 
-- [TeleAgent 在银河麒麟 V11 升级失败：KARE 容器手动部署与技能上限解除实战](blog/ai/TeleAgent%20在银河麒麟%20V11%20升级失败：KARE%20容器手动部署与技能上限解除实战.md)（2026-11-20）
+- [TeleAgent 在银河麒麟 V11 升级失败：KARE 容器手动部署与技能上限解除实战](blog/ai/TeleAgent%20麒麟%20V11%20手动升级与技能扩容实战.md)（2026-11-20）
   - Qwen Code 多轮协助沉淀的 KARE 手动部署与三层技能限制排查记录
   - 包含完整备份、部署、两阶段补丁、验证和回滚方法
 - [TeleAgent 邀请奖励升级：我实际试用后，整理了这份邀请与积分说明](blog/ai/teleagent-invitation-rewards.md)

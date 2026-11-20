@@ -4,7 +4,7 @@ date: 2026-11-20
 tags: [TeleAgent, 银河麒麟, KARE, Electron, ARM64, 信创, 二进制补丁]
 description: TeleAgent 在银河麒麟 V11 ARM64 上无法通过官方通道升级（kysec 签名强制、退出码 16），本文记录从 2.4 到 3.1.1 十余次版本的手动解包部署流程、dpkg 元数据同步，以及技能启用数量三层拦截（Electron asar、Go 二进制、SQLite 触发器）的完整解除方案与回滚方法。
 status: published
-original: https://gitee.com/digtip/notes/blob/main/blog/ai/TeleAgent%20%E5%9C%A8%E9%93%B6%E6%B2%B3%E9%BA%92%E9%BA%9F%20V11%20%E5%8D%87%E7%BA%A7%E5%A4%B1%E8%B4%A5%EF%BC%9AKARE%20%E5%AE%B9%E5%99%A8%E6%89%8B%E5%8A%A8%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%8A%80%E8%83%BD%E4%B8%8A%E9%99%90%E8%A7%A3%E9%99%A4%E5%AE%9E%E6%88%98.md
+original: https://gitee.com/digtip/notes/blob/main/blog/ai/TeleAgent%20%E9%BA%92%E9%BA%9F%20V11%20%E6%89%8B%E5%8A%A8%E5%8D%87%E7%BA%A7%E4%B8%8E%E6%8A%80%E8%83%BD%E6%89%A9%E5%AE%B9%E5%AE%9E%E6%88%98.md
 ---
 
 # TeleAgent 在银河麒麟 V11 升级失败：KARE 容器手动部署与技能上限解除实战
@@ -476,5 +476,5 @@ AI 可以把路径、版本号、偏移量按本机实际值替换，把查询�
 ---
 
 > 本文原文托管于 Gitee：
-> https://gitee.com/digtip/notes/blob/main/blog/ai/TeleAgent%20%E5%9C%A8%E9%93%B6%E6%B2%B3%E9%BA%92%E9%BA%9F%20V11%20%E5%8D%87%E7%BA%A7%E5%A4%B1%E8%B4%A5%EF%BC%9AKARE%20%E5%AE%B9%E5%99%A8%E6%89%8B%E5%8A%A8%E9%83%A8%E7%BD%B2%E4%B8%8E%E6%8A%80%E8%83%BD%E4%B8%8A%E9%99%90%E8%A7%A3%E9%99%A4%E5%AE%9E%E6%88%98.md
+> https://gitee.com/digtip/notes/blob/main/blog/ai/TeleAgent%20%E9%BA%92%E9%BA%9F%20V11%20%E6%89%8B%E5%8A%A8%E5%8D%87%E7%BA%A7%E4%B8%8E%E6%8A%80%E8%83%BD%E6%89%A9%E5%AE%B9%E5%AE%9E%E6%88%98.md
 > GitHub 为只读镜像备份。
