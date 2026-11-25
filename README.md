@@ -65,6 +65,7 @@
 | [`learn/`](learn/) | 可公开的学习记录 |
 | [`diary/`](diary/) | 技术随笔与经验感悟 |
 | [`assets/`](assets/) | 已发布文章的封面及必要图片资源 |
+| [`vibe coding/`](vibe%20coding/) | Vibe Coding 实战文章的通用脱敏代码、测试与运行说明 |
 
 ## 写作与发布原则
 

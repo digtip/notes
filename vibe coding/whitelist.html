@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本地白名单管理系统</title>
+<style>
+  :root{--blue:#1a3a6b; --blue2:#2b5a9e; --gold:#c9a227; --bg:#eef2f8; --line:#dbe3ee;
+        --ok:#1e8e4a; --warn:#b8860b; --err:#b02a37; --gray:#8a97ac;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif; background:var(--bg); color:#1f2d3d; font-size:14px;}
+  .topbar{background:linear-gradient(135deg,#16305c,#24518f); color:#fff; padding:14px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .topbar h1{font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px;}
+  .topbar h1 .badge{background:var(--gold); color:#1c2b45; font-size:12px; padding:2px 10px; border-radius:12px; font-weight:700;}
+  .topbar .stat{font-size:13px; opacity:.92;}
+  .topbar .stat b{color:#ffd97a; font-size:15px;}
+  .topbar .spacer{flex:1;}
+  .tag-off{background:rgba(255,255,255,.18); color:#fff; border-radius:10px; padding:1px 10px; font-size:11px; font-weight:600;}
+  .tag-ok{background:#57c98a; color:#fff; border-radius:10px; padding:1px 10px; font-size:11px; font-weight:600;}
+  .tabs{display:flex; gap:4px; background:#fff; padding:8px 20px 0; border-bottom:2px solid var(--line);}
+  .tab{padding:9px 18px; font-size:14px; font-weight:600; color:#5a6a85; cursor:pointer; border:1px solid var(--line); border-bottom:none; border-radius:9px 9px 0 0; background:#f3f6fb; user-select:none;}
+  .tab.active{color:var(--blue); background:#fff; border-color:var(--line); position:relative; top:2px; padding-bottom:11px;}
+  .panel{display:none; padding:16px 20px;}
+  .panel.active{display:block;}
+  #panel-query.active{display:flex !important;}
+  .card{background:#fff; border:1px solid var(--line); border-radius:11px; padding:11px 16px; box-shadow:0 1px 4px rgba(28,58,107,.05); margin-bottom:14px;}
+  .card h3{font-size:14.5px; color:var(--blue); margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .hint{color:var(--gray); font-size:12.5px; line-height:1.7;}
+  .btn{display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border:none; border-radius:7px; cursor:pointer; font-size:13.5px; font-weight:600; transition:filter .15s;}
+  .btn:hover{filter:brightness(1.08);}
+  .btn:disabled{opacity:.45; cursor:not-allowed; filter:none;}
+  .btn-blue{background:var(--blue2); color:#fff;}
+  .btn-gold{background:var(--gold); color:#1c2b45;}
+  .btn-green{background:var(--ok); color:#fff; box-shadow:0 2px 6px rgba(30,142,74,.3);}
+  .btn-gray{background:#e4e9f1; color:#33425a;}
+  .btn-danger{background:#fff; color:var(--err); border:1px solid #e0b3b9;}
+  .btn-mini{padding:2px 10px; font-size:12px; border-radius:6px; line-height:1.4;}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  label.fl{font-size:13px; color:#46587a; font-weight:600; white-space:nowrap;}
+  textarea{width:100%; min-height:170px; padding:10px 12px; border:1px solid #c9d4e4; border-radius:9px; font-size:13.5px; font-family:inherit; line-height:1.8; outline:none; resize:vertical; background:#fbfcfe;}
+  textarea:focus{border-color:var(--blue2); box-shadow:0 0 0 2px rgba(44,90,169,.12);}
+  input[type=text], input[type=date]{padding:7px 10px; border:1px solid #c9d4e4; border-radius:7px; font-size:13.5px; outline:none; background:#fff;}
+  input[type=text]:focus, input[type=date]:focus{border-color:var(--blue2); box-shadow:0 0 0 2px rgba(44,90,169,.12);}
+  .statline{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 4px;}
+  .pill{border-radius:9px; padding:4px 12px; font-size:12.5px; font-weight:700;}
+  .pill.new{background:#e4f4e8; color:var(--ok);}
+  .pill.exist{background:#e8effb; color:var(--blue2);}
+  .pill.dup{background:#fdf3d7; color:var(--warn);}
+  .pill.invalid{background:#fbe0e3; color:var(--err);}
+  table{width:100%; border-collapse:separate; border-spacing:0; background:#fff; box-shadow:0 1px 4px rgba(28,58,107,.06);}
+  th{background:#eef3fa; color:#2b4a7a; font-size:12.5px; padding:8px 8px; border-bottom:2px solid var(--line); text-align:center; white-space:nowrap;}
+  td{padding:6px 8px; border-bottom:1px solid #eef2f8; text-align:center; vertical-align:middle; font-size:13px;}
+  tr:hover td{background:#f7faff;}
+  td.ops{white-space:nowrap;}
+  td.ops .btn{margin:0 2px;}
+  tr.row-off td{background:#f4f4f6; color:#9aa4b6;}
+  tr.row-off td.mono{color:#7d8a9e; text-decoration:line-through;}
+  td.left{text-align:left;}
+  td.mono{font-family:Consolas,Menlo,monospace; letter-spacing:.4px;}
+  .st{border-radius:9px; padding:1px 9px; font-size:11.5px; font-weight:700; white-space:nowrap;}
+  .st.new{background:#e4f4e8; color:var(--ok);}
+  .st.exist{background:#e8effb; color:var(--blue2);}
+  .st.dup{background:#fdf3d7; color:var(--warn);}
+  .st.invalid{background:#fbe0e3; color:var(--err);}
+  .empty{color:var(--gray); text-align:center; padding:26px 0; font-size:13px;}
+  .tbl-wrap{border:1px solid var(--line); border-radius:10px; overflow:auto;}
+  .tbl-wrap table{box-shadow:none; border-radius:0;}
+  /* 查询面板：占满视口剩余高度，表格内部滚动，分页/操作栏始终可见 */
+  #panel-query{flex-direction:column; height:calc(100vh - 112px); padding-bottom:8px; box-sizing:border-box;}
+  /* 查询表行高压缩：20条刚好一屏 */
+  #panel-query td{padding:7px 8px; font-size:14px; line-height:1.35;}
+  #panel-query th{padding:5px 8px; font-size:13px;}
+  #panel-query > .card:first-child{flex-shrink:0;}
+  #panel-query .card:only-child{flex:1 1 auto;}
+  #panel-query .tbl-card{flex:1 1 auto; display:flex; flex-direction:column; min-height:0; margin-bottom:0;}
+  #panel-query .tbl-wrap{flex:1 1 auto; min-height:0; overflow:auto;}
+  /* 表头吸顶：容器内滚动时表头可见 */
+  #panel-query thead th{position:sticky; top:0; z-index:2;}
+  /* 预览/导出表格：适中上限 */
+  #previewCard .tbl-wrap, #expCard .tbl-wrap{max-height:60vh;}
+  .modal-mask{position:fixed; inset:0; background:rgba(15,28,50,.45); display:none; align-items:center; justify-content:center; z-index:50;}
+  .modal-mask.show{display:flex;}
+  .modal{background:#fff; border-radius:12px; width:92%; max-width:440px; padding:20px 22px; box-shadow:0 12px 40px rgba(10,25,50,.3);}
+  .modal h2{font-size:15.5px; color:var(--blue); margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;}
+  .modal .x{cursor:pointer; color:#7b879c; font-size:17px; padding:0 5px;}
+  .modal .x:hover{color:var(--err);}
+  .frow{display:flex; align-items:center; gap:10px; margin-bottom:11px;}
+  .frow label{width:52px; font-size:13px; color:#46587a; font-weight:600; flex-shrink:0;}
+  .frow input{flex:1;}
+  .notice{display:none; background:#fff8e6; border:1px solid #f0d48a; color:#7a5c0e; border-radius:9px; padding:8px 14px; margin:10px 20px 0; font-size:12.5px;}
+  .notice.show{display:block;}
+  .okbar{display:none; background:#e4f4e8; border:1px solid #b7e0c5; color:#135f34; border-radius:9px; padding:8px 14px; margin:10px 0 2px; font-size:13px;}
+  .okbar.show{display:block;}
+  /* 分页样式（与计数同一行） */
+  .pager-bar{display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:nowrap; flex-shrink:0;}
+  .pg-count{font-size:12px; color:#8896ab;}
+  .pg-count b{color:var(--blue2); font-size:13.5px;}
+  .pgbtn{min-width:28px; height:24px; padding:0 8px; border:1px solid #c9d4e4; background:#fff; border-radius:6px; cursor:pointer; font-size:13px; color:#33425a; font-weight:600;}
+  .pgbtn:hover:not(:disabled){background:var(--blue2); color:#fff; border-color:var(--blue2);}
+  .pgbtn:disabled{opacity:.35; cursor:not-allowed;}
+  .pgbtn.cur{background:var(--blue2); color:#fff; border-color:var(--blue2);}
+  .pager-info{font-size:13px; color:#46587a; font-weight:700; margin-left:4px;}
+  .pg-sep{color:#c2ccdb; margin:0 2px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1><span class="badge">LOCAL</span> 本地白名单管理系统</h1>
+  <span class="stat">共 <b id="statTotal">-</b> 条记录</span>
+  <span class="stat">今日新增 <b id="statToday">-</b> 条</span>
+  <span class="stat">已退出 <b id="statRemoved">-</b> 条</span>
+  <div class="spacer"></div>
+  <span id="svcTag" class="tag-off">服务未连接</span>
+</div>
+
+<div class="notice" id="offline">服务未连接：请先运行 python3 本地白名单管理系统.py（默认端口 8210），再刷新本页。</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="import">① 批量新增（当批解析）</div>
+  <div class="tab" data-tab="query">② 查询 / 更新（全库检索）</div>
+  <div class="tab" data-tab="export">③ 导出清单（按日期）</div>
+</div>
+
+<!-- ============ Tab1 批量新增 ============ -->
+<div class="panel active" id="panel-import">
+  <div class="card">
+    <h3>粘贴录入（每行一条：姓名 手机号 公司）</h3>
+    <textarea id="pasteBox" placeholder="虚构示例（姓名和公司可留空，手机号必填）：&#10;示例人员甲 13800000001 示例单位A&#10;示例人员乙 13800000002 示例单位B&#10;13800000003 示例单位C"></textarea>
+    <div class="row" style="margin-top:10px;">
+      <label class="fl">入库日期</label>
+      <input type="date" id="addDate">
+      <button class="btn btn-blue" id="btnParse">解析预览</button>
+      <button class="btn btn-green" id="btnCommit" disabled>确认入库</button>
+      <span class="hint" style="flex:1;">本批与库内自动去重；导出请用「③ 导出新增」。</span>
+    </div>
+    <div class="statline" id="parseStat" style="display:none;">
+      <span class="pill new">新增 <b id="cNew">0</b></span>
+      <span class="pill exist">已有 <b id="cExist">0</b></span>
+      <span class="pill dup">批次内重复 <b id="cDup">0</b></span>
+      <span class="pill invalid">格式错误 <b id="cInvalid">0</b></span>
+    </div>
+    <div class="okbar" id="commitOk"></div>
+  </div>
+  <div class="card" id="previewCard" style="display:none;">
+    <h3>本批解析结果（仅本批，不涉及库内清单）</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:70px;">状态</th><th style="width:110px;">姓名</th><th style="width:130px;">手机号</th><th>公司</th><th style="width:170px;">说明</th></tr></thead>
+      <tbody id="previewBody"></tbody>
+    </table></div>
+    <div class="row" style="margin-top:10px; justify-content:flex-end;">
+      <span class="hint">仅「新增」状态的记录会入库。</span>
+      <button class="btn btn-green" id="btnCommit2" disabled>确认入库新增记录</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Tab2 查询/更新 ============ -->
+<div class="panel" id="panel-query">
+  <div class="card tbl-card">
+    <div class="row" style="margin-bottom:8px; flex-wrap:nowrap; gap:8px;">
+      <input type="text" id="qKeyword" placeholder="姓名 / 手机号 / 公司" style="width:160px; padding:5px 10px; flex:0 0 auto;">
+      <input type="date" id="qFrom" style="width:122px; padding:4px 8px; flex:0 0 auto;"> <span class="hint">至</span> <input type="date" id="qTo" style="width:122px; padding:4px 8px; flex:0 0 auto;">
+      <button class="btn btn-blue" id="btnQuery" style="flex:0 0 auto; padding:5px 14px;">查 询</button>
+      <button class="btn btn-gray" id="btnReset" style="flex:0 0 auto; padding:5px 12px;">重置</button>
+      <label class="fl" style="flex:0 0 auto; color:#8a94a8;"><input type="checkbox" id="showRemoved" style="vertical-align:-2px;"> 含已退出</label>
+      <span style="width:12px; flex:0 0 auto;"></span>
+      <label class="fl" style="flex:0 0 auto;"><input type="checkbox" id="checkAll" style="vertical-align:-2px;"> 本页全选</label>
+      <span class="hint" id="selInfo" style="flex:0 0 auto; min-width:64px;">未选</span>
+      <input type="text" id="batchCompany" placeholder="批量改公司…" style="width:140px; padding:5px 10px; flex:0 0 auto;">
+      <button class="btn btn-blue" id="btnBatchUpdate" style="flex:0 0 auto; padding:5px 14px;">应用选中</button>
+      <span style="flex:1;"></span>
+      <label class="fl" style="flex:0 0 auto;">每页</label>
+      <select id="pageSize" style="padding:4px 8px; border:1px solid #c9d4e4; border-radius:7px; font-size:13px; background:#fff; color:#1f293d; flex:0 0 auto;">
+        <option value="20" selected>20 条</option>
+        <option value="50">50 条</option>
+        <option value="100">100 条</option>
+      </select>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th style="width:36px;">选</th><th style="width:46px;">序</th>
+        <th style="width:110px;">姓名</th><th style="width:128px;">手机号</th>
+        <th>公司</th><th style="width:100px;">入库日期</th>
+        <th style="width:150px;">更新时间</th><th style="width:130px;">操作</th>
+      </tr></thead>
+      <tbody id="queryBody"></tbody>
+    </table></div>
+    <div class="pager-bar" id="pager" style="margin-top:6px;">
+      <span class="pg-count" id="queryCount"></span>
+      <span style="flex:1;"></span>
+      <span class="pager-info" id="pagerInfo"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Tab3 导出清单 ============ -->
+<div class="panel" id="panel-export">
+  <div class="card">
+    <h3>导出新增号码（仅电话号码一列、无表头）</h3>
+    <div class="row">
+      <label class="fl">入库日期</label>
+      <input type="date" id="expDate">
+      <button class="btn btn-blue" id="btnExpPreview">查看该日新增</button>
+      <button class="btn btn-gold" id="btnExport">导出 Excel</button>
+    </div>
+  </div>
+  <div class="card" id="expCard" style="display:none;">
+    <h3 id="expTitle">该日新增记录（仅导出用）</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:110px;">姓名</th><th style="width:130px;">手机号</th><th>公司</th><th style="width:110px;">入库日期</th></tr></thead>
+      <tbody id="expBody"></tbody>
+    </table></div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <h3>导出退出清单（含原号码与备注，用于记录退出明细）</h3>
+    <div class="row">
+      <label class="fl">退出日期</label>
+      <input type="date" id="rmExpDate">
+      <button class="btn btn-blue" id="btnRmExpPreview">查看该日退出</button>
+      <button class="btn btn-gold" id="btnRmExport">导出 Excel</button>
+    </div>
+  </div>
+  <div class="card" id="rmExpCard" style="display:none;">
+    <h3 id="rmExpTitle">该日退出记录</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:100px;">姓名</th><th style="width:126px;">原手机号</th><th>公司</th><th style="width:104px;">退出日期</th><th>备注</th></tr></thead>
+      <tbody id="rmExpBody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- 退出弹窗 -->
+<div class="modal-mask" id="rmMask">
+  <div class="modal">
+    <h2>退出白名单 <span class="x" id="rmClose">✕</span></h2>
+    <div class="frow"><label>号码</label><b id="rmPhone" style="font-size:16px; letter-spacing:.5px;"></b></div>
+    <div class="frow"><label>人员</label><span id="rmName" style="color:#5a6a85;"></span></div>
+    <div class="frow"><label>退出日期</label><input type="date" id="rmDate"></div>
+    <div class="frow"><label>备注</label><input type="text" id="rmNote" placeholder="如：更换为新号 139xxxxxxxx"></div>
+    <div class="hint" style="margin-bottom:12px;">退出的号码保留历史、可恢复；主白名单Excel将不再包含该号。\n换号流程：退出旧号 → 到「① 批量新增」录入新号。</div>
+    <div class="row" style="justify-content:flex-end;">
+      <button class="btn btn-gray" id="rmCancel">取消</button>
+      <button class="btn btn-danger" id="rmSave">确认退出</button>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="modal-mask" id="editMask">
+  <div class="modal">
+    <h2>编辑记录 <span class="x" id="editClose">✕</span></h2>
+    <div class="frow"><label>姓名</label><input type="text" id="eName"></div>
+    <div class="frow"><label>手机号</label><input type="text" id="ePhone" maxlength="11"></div>
+    <div class="frow"><label>公司</label><input type="text" id="eCompany"></div>
+    <div class="hint" style="margin-bottom:12px;">保存后自动记录更新时间；手机号修改会与库内查重。</div>
+    <div class="row" style="justify-content:flex-end;">
+      <button class="btn btn-gray" id="editCancel">取消</button>
+      <button class="btn btn-green" id="editSave">保 存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+var RECORDS = [], TODAY = "";
+var pendingNew = [];
+var editingId = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+
+function fmtDT(s){ return s ? String(s).replace("T"," ") : "—"; }
+
+async function api(path, body){
+  var opt = body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {cache:"no-store"};
+  var r = await fetch(path, opt);
+  var j = await r.json();
+  if(!j.ok && j.error) throw new Error(j.error);
+  return j;
+}
+
+async function refreshData(){
+  try{
+    var d = await api("/api/data");
+    RECORDS = d.records; TODAY = d.today;
+    $("statTotal").textContent = d.total;
+    $("statToday").textContent = d.todayNew;
+    $("statRemoved").textContent = d.removedTotal || 0;
+    $("svcTag").className = "tag-ok"; $("svcTag").textContent = "服务正常";
+    $("offline").classList.remove("show");
+    return true;
+  }catch(e){
+    $("svcTag").className = "tag-off"; $("svcTag").textContent = "服务未连接";
+    $("offline").classList.add("show");
+    return false;
+  }
+}
+
+/* ---------- Tab 切换 ---------- */
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
+    document.querySelectorAll(".panel").forEach(function(x){ x.classList.remove("active"); });
+    t.classList.add("active");
+    $("panel-" + t.dataset.tab).classList.add("active");
+    if(t.dataset.tab === "export"){
+      $("expDate").value = $("expDate").value || TODAY;
+      $("rmExpDate").value = $("rmExpDate").value || TODAY;
+    }
+  });
+});
+
+/* ---------- Tab1 批量新增 ---------- */
+var ST_LABEL = {new:"新增", exist:"已有", dup:"批次内重复", invalid:"格式错误"};
+$("btnParse").addEventListener("click", async function(){
+  var text = $("pasteBox").value;
+  if(!text.trim()){ alert("请先粘贴要录入的内容"); return; }
+  var btn = this; btn.disabled = true; btn.textContent = "解析中…";
+  try{
+    var d = await api("/api/parse", {text: text});
+    var res = d.results, st = d.stat;
+    $("parseStat").style.display = "flex";
+    $("cNew").textContent = st.new; $("cExist").textContent = st.exist;
+    $("cDup").textContent = st.dup; $("cInvalid").textContent = st.invalid;
+    var html = res.map(function(r){
+      return "<tr><td><span class='st " + r.status + "'>" + ST_LABEL[r.status] + "</span></td>"
+        + "<td>" + esc(r.name) + "</td><td class='mono'>" + esc(r.phone) + "</td>"
+        + "<td class='left'>" + esc(r.company) + "</td><td>" + esc(r.reason || "—") + "</td></tr>";
+    }).join("");
+    $("previewBody").innerHTML = html || "<tr><td colspan='5' class='empty'>未有可解析内容</td></tr>";
+    pendingNew = res.filter(function(r){ return r.status === "new"; });
+    var can = pendingNew.length > 0;
+    $("btnCommit").disabled = !can; $("btnCommit2").disabled = !can;
+    $("btnCommit").textContent = can ? ("确认入库 " + st.new + " 条新增") : "确认入库";
+    $("btnCommit2").textContent = $("btnCommit").textContent;
+    $("previewCard").style.display = "block";
+    $("commitOk").classList.remove("show");
+  }catch(e){ alert("解析失败：" + e.message); }
+  btn.disabled = false; btn.textContent = "解析预览";
+});
+
+async function doCommit(){
+  if(!pendingNew.length) return;
+  if(!confirm("确认将 " + pendingNew.length + " 条新记录入库？\n入库日期：" + ($("addDate").value || TODAY)) ) return;
+  var items = pendingNew.map(function(r){ return {name:r.name, phone:r.phone, company:r.company}; });
+  try{
+    var d = await api("/api/commit", {items: items, addDate: $("addDate").value || TODAY});
+    $("commitOk").textContent = "✓ 已入库 " + d.added + " 条新记录，当前共 " + d.total + " 条。" + (d.backup && d.backup.length ? "（已自动备份原数据）" : "");
+    $("commitOk").classList.add("show");
+    $("pasteBox").value = "";
+    pendingNew = [];
+    $("btnCommit").disabled = true; $("btnCommit2").disabled = true;
+    $("previewBody").innerHTML = "";
+    $("previewCard").style.display = "none";
+    await refreshData();
+  }catch(e){ alert("入库失败：" + e.message); }
+}
+$("btnCommit").addEventListener("click", doCommit);
+$("btnCommit2").addEventListener("click", doCommit);
+
+/* ---------- Tab2 查询/更新（带分页） ---------- */
+var Q_RESULT = [];      // 当前查询结果全量
+var Q_PAGE = 1;         // 当前页码
+var Q_SIZE = 20;        // 每页条数
+
+function pageCount(){
+  return Math.max(1, Math.ceil(Q_RESULT.length / Q_SIZE));
+}
+
+function runQuery(keepPage){
+  var kw = $("qKeyword").value.trim().toLowerCase();
+  var from = $("qFrom").value, to = $("qTo").value;
+  var showRemoved = $("showRemoved").checked;
+  Q_RESULT = RECORDS.filter(function(r){
+    if(!showRemoved && r.status === "removed") return false;
+    if(kw){
+      var hay = (r.name + " " + r.phone + " " + r.company).toLowerCase();
+      if(hay.indexOf(kw) === -1) return false;
+    }
+    if(from && r.addDate < from) return false;
+    if(to && r.addDate > to) return false;
+    return true;
+  });
+  if(!keepPage){ Q_PAGE = 1; SELC = {}; }
+  else { SELC = SELC || {}; }
+  renderPage();
+}
+
+var SELC = {};   // 跨页勾选状态 {id: true}
+
+function restoreChecks(){
+  document.querySelectorAll("#queryBody .ck").forEach(function(c){
+    var id = +c.closest("tr").dataset.id;
+    c.checked = !!SELC[id];
+  });
+}
+
+function renderPage(){
+  var total = Q_RESULT.length;
+  var pages = pageCount();
+  if(Q_PAGE > pages) Q_PAGE = pages;
+  var start = (Q_PAGE - 1) * Q_SIZE;
+  var slice = Q_RESULT.slice(start, start + Q_SIZE);
+  var html = slice.map(function(r){
+    var off = r.status === "removed";
+    var ops = off
+      ? "<button class='btn btn-mini btn-gray act-restore'>恢复</button>"
+      : "<button class='btn btn-mini btn-blue act-edit'>编辑</button><button class='btn btn-mini btn-danger act-remove'>退出</button>";
+    var state = off ? " <span class='st invalid'>已退出 " + esc(r.removedDate || "") + "</span>" : "";
+    return "<tr data-id='" + r.id + "'" + (off ? " class='row-off'" : "") + ">"
+      + "<td><input type='checkbox' class='ck'" + (off ? " disabled" : "") + "></td>"
+      + "<td>" + r.id + "</td>"
+      + "<td>" + esc(r.name) + "</td>"
+      + "<td class='mono'>" + esc(r.phone) + "</td>"
+      + "<td class='left'>" + esc(r.company) + state + "</td>"
+      + "<td>" + esc(r.addDate) + "</td>"
+      + "<td>" + (off ? (r.removedNote ? esc(r.removedNote) : "—") : fmtDT(r.updatedAt)) + "</td>"
+      + "<td class='ops'>" + ops + "</td>"
+      + "</tr>";
+  }).join("");
+  $("queryBody").innerHTML = html || "<tr><td colspan='8' class='empty'>无符合条件的记录</td></tr>";
+  var fromN = total ? start + 1 : 0, toN = start + slice.length;
+  $("queryCount").innerHTML = "共 <b>" + total + "</b> 条 / 库内 " + RECORDS.length + " 条，当前第 " + fromN + "-" + toN + " 条";
+  renderPager(total);
+  $("checkAll").checked = false;
+  // 遍历勾选过的记录是否在本页
+  restoreChecks(slice);
+  updateSelInfo();
+}
+
+function renderPager(total){
+  var pages = pageCount();
+  var box = $("pager");
+  var info = $("pagerInfo");
+  box.querySelectorAll(".pgbtn").forEach(function(x){ x.remove(); });
+  if(total <= Q_SIZE){
+    info.textContent = "";
+    return;
+  }
+  info.textContent = Q_PAGE + " / " + pages + " 页";
+  box.querySelectorAll(".pgbtn").forEach(function(x){ x.remove(); });
+  function mk(label, p, title, dis){
+    var b = document.createElement("button");
+    b.className = "pgbtn" + (dis ? "" : " cur-on") + (p === Q_PAGE && label !== "«" && label !== "»" && label !== "‹" && label !== "›" ? " cur" : "");
+    b.textContent = label;
+    b.dataset.p = p;
+    b.title = title;
+    if(dis) b.disabled = true;
+    box.appendChild(b);
+    return b;
+  }
+  mk("«", 1, "首页", Q_PAGE === 1);
+  mk("‹", Q_PAGE - 1, "上一页", Q_PAGE === 1);
+  var st = Math.max(1, Q_PAGE - 2), en = Math.min(pages, st + 4);
+  st = Math.max(1, Math.min(st, en - 4));
+  for(var i = st; i <= en; i++) mk(String(i), i, "第" + i + "页", false);
+  mk("›", Q_PAGE + 1, "下一页", Q_PAGE === pages);
+  mk("»", pages, "末页", Q_PAGE === pages);
+}
+
+$("pager").addEventListener("click", function(e){
+  var btn = e.target.closest(".pgbtn");
+  if(!btn || btn.disabled) return;
+  Q_PAGE = +btn.dataset.p;
+  renderPage();
+  $("queryBody").closest(".tbl-wrap").scrollIntoView({behavior:"smooth", block:"start"});
+});
+
+$("pageSize").addEventListener("change", function(){
+  Q_SIZE = +this.value;
+  Q_PAGE = 1;
+  renderPage();
+});
+
+$("btnQuery").addEventListener("click", function(){ runQuery(false); });
+$("btnReset").addEventListener("click", function(){
+  $("qKeyword").value = ""; $("qFrom").value = ""; $("qTo").value = "";
+  runQuery();
+});
+$("qKeyword").addEventListener("keydown", function(e){ if(e.key === "Enter") runQuery(false); });
+$("showRemoved").addEventListener("change", function(){ runQuery(true); });
+
+$("queryBody").addEventListener("click", function(e){
+  var tr = e.target.closest("tr[data-id]");
+  if(!tr) return;
+  var rec = RECORDS.find(function(r){ return r.id === +tr.dataset.id; });
+  if(!rec) return;
+  if(e.target.closest(".act-edit")){ openEdit(rec); return; }
+  if(e.target.closest(".act-remove")){ openRemove(rec); return; }
+  if(e.target.closest(".act-restore")){
+    if(!confirm("确认恢复号码 " + rec.phone + "（" + (rec.name || rec.company || "未命名") + "）为在用状态？")) return;
+    api("/api/restore", {id: rec.id}).then(function(){
+      return refreshData().then(function(){ runQuery(true); });
+    }).catch(function(err){ alert("恢复失败：" + err.message); });
+  }
+});
+$("queryBody").addEventListener("change", function(e){
+  if(e.target.classList.contains("ck")){
+    var id = +e.target.closest("tr").dataset.id;
+    if(e.target.checked){ SELC[id] = true; } else { delete SELC[id]; }
+    updateSelInfo();
+  }
+});
+$("checkAll").addEventListener("change", function(){
+  var on = $("checkAll").checked;
+  document.querySelectorAll("#queryBody .ck").forEach(function(c){
+    c.checked = on;
+    var id = +c.closest("tr").dataset.id;
+    if(on){ SELC[id] = true; } else { delete SELC[id]; }
+  });
+  // 当前页全选时提示本页已选数量
+  updateSelInfo();
+});
+function selectedIds(){
+  return Object.keys(SELC).map(Number);
+}
+function clearSel(){ SELC = {}; updateSelInfo(); }
+function updateSelInfo(){
+  var n = selectedIds().length;
+  $("selInfo").textContent = n ? ("已选 " + n + " 条") : "未选";
+}
+$("btnBatchUpdate").addEventListener("click", async function(){
+  var ids = selectedIds();
+  var company = $("batchCompany").value.trim();
+  if(!ids.length){ alert("请先勾选要修改的记录"); return; }
+  if(!company){ alert("请填写要统一设置的公司名称"); return; }
+  if(!confirm("将 " + ids.length + " 条记录的公司统一改为「" + company + "」？")) return;
+  try{
+    var d = await api("/api/update_batch", {ids: ids, company: company});
+    alert("已更新 " + d.updated + " 条记录（更新时间已记录）");
+    clearSel();
+    await refreshData(); runQuery();
+  }catch(e){ alert("批量更新失败：" + e.message); }
+});
+
+/* 退出弹窗 */
+function openRemove(rec){
+  $("rmPhone").textContent = rec.phone;
+  $("rmName").textContent = (rec.name || "（未填）") + " · " + (rec.company || "（未填公司）");
+  $("rmDate").value = TODAY;
+  $("rmNote").value = "";
+  $("rmMask").dataset.id = rec.id;
+  $("rmMask").classList.add("show");
+  $("rmNote").focus();
+}
+$("rmClose").addEventListener("click", function(){ $("rmMask").classList.remove("show"); });
+$("rmCancel").addEventListener("click", function(){ $("rmMask").classList.remove("show"); });
+$("rmMask").addEventListener("click", function(e){ if(e.target === this) $(this).classList.remove("show"); });
+$("rmSave").addEventListener("click", async function(){
+  var rid = +$("rmMask").dataset.id;
+  var rdate = $("rmDate").value || TODAY;
+  var note = $("rmNote").value.trim();
+  if(!confirm("确认退出白名单？\n退出后号码不再进入在用名单，可导出退出清单。")) return;
+  try{
+    await api("/api/remove", {id: rid, removedDate: rdate, note: note});
+    $("rmMask").classList.remove("show");
+    await refreshData(); runQuery(true);
+  }catch(err){ alert("退出失败：" + err.message); }
+});
+
+/* 编辑弹窗 */
+function openEdit(rec){
+  editingId = rec.id;
+  $("eName").value = rec.name; $("ePhone").value = rec.phone; $("eCompany").value = rec.company;
+  $("editMask").classList.add("show");
+  $("eName").focus();
+}
+$("editClose").addEventListener("click", closeEdit);
+$("editCancel").addEventListener("click", closeEdit);
+$("editMask").addEventListener("click", function(e){ if(e.target === this) closeEdit(); });
+function closeEdit(){ $("editMask").classList.remove("show"); editingId = null; }
+$("editSave").addEventListener("click", async function(){
+  var name = $("eName").value.trim(), phone = $("ePhone").value.trim().replace(/\D/g,""), company = $("eCompany").value.trim();
+  if(!/^1\d{10}$/.test(phone)){ alert("手机号无效（应为1开头的11位数字）"); return; }
+  try{
+    var d = await api("/api/update", {id: editingId, name: name, phone: phone, company: company});
+    closeEdit();
+    if(d.changed){ await refreshData(); runQuery(); }
+    else alert("内容无变化，未更新");
+  }catch(e){ alert("保存失败：" + e.message); }
+});
+
+/* ---------- Tab3 导出新增 ---------- */
+$("btnExpPreview").addEventListener("click", function(){
+  var date = $("expDate").value || TODAY;
+  var list = RECORDS.filter(function(r){ return r.addDate === date; });
+  $("expTitle").textContent = date + " 新增记录（" + list.length + " 条）";
+  $("expBody").innerHTML = list.map(function(r){
+    return "<tr><td>" + esc(r.name) + "</td><td class='mono'>" + esc(r.phone) + "</td>"
+      + "<td class='left'>" + esc(r.company) + "</td><td>" + esc(r.addDate) + "</td></tr>";
+  }).join("") || "<tr><td colspan='4' class='empty'>该日期无新增记录</td></tr>";
+  $("expCard").style.display = "block";
+});
+$("btnExport").addEventListener("click", function(){
+  var date = $("expDate").value || TODAY;
+  var list = RECORDS.filter(function(r){ return r.addDate === date && r.status !== "removed"; });
+  if(!list.length){ alert(date + " 无新增记录，无需导出"); return; }
+  window.location.href = "/api/export?date=" + encodeURIComponent(date);
+});
+
+/* ---------- 退出清单预览/导出 ---------- */
+$("btnRmExpPreview").addEventListener("click", function(){
+  var date = $("rmExpDate").value || TODAY;
+  var list = RECORDS.filter(function(r){ return r.status === "removed" && r.removedDate === date; });
+  $("rmExpTitle").textContent = date + " 退出记录（" + list.length + " 条）";
+  $("rmExpBody").innerHTML = list.map(function(r){
+    return "<tr><td>" + esc(r.name) + "</td><td class='mono'>" + esc(r.phone) + "</td>"
+      + "<td class='left'>" + esc(r.company) + "</td><td>" + esc(r.removedDate) + "</td>"
+      + "<td class='left'>" + esc(r.removedNote || "—") + "</td></tr>";
+  }).join("") || "<tr><td colspan='5' class='empty'>该日期无退出记录</td></tr>";
+  $("rmExpCard").style.display = "block";
+});
+$("btnRmExport").addEventListener("click", function(){
+  var date = $("rmExpDate").value || TODAY;
+  var list = RECORDS.filter(function(r){ return r.status === "removed" && r.removedDate === date; });
+  if(!list.length){ alert(date + " 无退出记录，无需导出"); return; }
+  window.location.href = "/api/export?type=removed&date=" + encodeURIComponent(date);
+});
+
+/* ---------- 初始化 ---------- */
+(async function(){
+  var ok = await refreshData();
+  if(ok){
+    $("addDate").value = TODAY;
+    $("expDate").value = TODAY;
+    runQuery();
+  }
+})();
+</script>
+</body>
+</html>
