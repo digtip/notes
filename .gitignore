@@ -19,6 +19,8 @@ desktop.ini
 *.tmp
 *.bak
 *.log
+__pycache__/
+*.pyc
 
 # 大图本地缓存（如使用外部图床，不入库）
 # assets/*.png
