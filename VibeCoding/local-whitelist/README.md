@@ -14,7 +14,7 @@
 ## 运行
 
 ```bash
-cd "vibe coding/local-whitelist"
+cd VibeCoding/local-whitelist
 python3 -m pip install -r requirements.txt
 python3 本地白名单管理系统.py
 ```
