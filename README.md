@@ -41,6 +41,10 @@
 9. [银河麒麟 V11 系统盘爆满治理：把 56G 的 var-opt 迁到数据盘（bind mount 全流程）](blog/kirin/银河麒麟%20V11%20系统盘爆满治理：把%2056G%20的%20var-opt%20迁到数据盘（bind%20mount%20全流程）.md)
    - 系统盘释放 53G 的完整迁移、持久化、验证与旧副本清理过程
 
+10. [Betterbird 大附件“另存为”卡顿排查与修复](blog/kirin/Betterbird%20大附件“另存为”卡顿排查与修复.md)
+    - 从 mbox 只读提取大附件，排查主线程、重复处理、CPU 与实时扫描因素
+    - 包含兼容性核验、独立目录升级、验证、回退及官方 Bug 引用纠错
+
 ### 网络与工程实践
 
 - [能 ping 通 IP 却打不开网页：systemd-resolved 的 DNSSEC 排障与安全绕过](blog/dev/能%20ping%20通%20IP%20却打不开网页：systemd-resolved%20的%20DNSSEC%20排障与安全绕过.md)
