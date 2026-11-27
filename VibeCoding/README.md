@@ -5,5 +5,6 @@
 | 项目目录 | 用途 |
 |---|---|
 | [`local-whitelist/`](local-whitelist/) | 本地白名单管理系统：批量导入、查重、维护、导出与备份 |
+| [`teleagent-im-notify/`](teleagent-im-notify/) | TeleAgent 长任务完成通知：向 ais 投递队列写一条 proactive 投递，由官方适配器推送到微信/企微/飞书等 IM；含技能定义与跨平台安装脚本 |
 
 运行某个项目时，先进入对应项目目录，再阅读其中的 `README.md`。真实业务数据、自动生成的数据文件和备份不得提交到公开仓库。
