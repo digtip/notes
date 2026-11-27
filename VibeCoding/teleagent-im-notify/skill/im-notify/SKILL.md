@@ -73,12 +73,12 @@ sqlite3 ~/.local/share/TeleAgent/users/<userId>/ais/ais.db \
 
 - `messaging_deliveries`：一条投递（`kind='proactive'`、`state='pending'`、`route_snapshot={"conversation":…,"reply_ref":…}`）
 - `messaging_delivery_items`：投递明细（`state='pending'`），**缺它不会被取走**
-- ais 派发 worker 约 2 秒扫一次并交给 im-adapter 发送；官方接口 `CreateProactiveDelivery` 需要 plugin token，外部脚本拿不到，所以本技能走写库路径
+- 本脚本向客户端的本地投递队列写入一条主动投递记录，ais 的派发 worker 约 2 秒扫一次并交给 im-adapter 发送，由适配器调对应平台的 SDK 投递
 
 ais 的取件条件逆向自其二进制 SQL，升级后若投递不再被取走，先核对表名、字段与状态取值是否仍一致。
 
 ## 七、边界
 
-- 不装服务、不改启动项、不开端口；回退只需删除本技能目录。
+- 不装服务、不改启动项、不开端口、不留常驻进程；脚本只写入投递队列的一条记录，其它数据不受影响。
 - 表结构属内部实现，TeleAgent 升级后需重新核验；本技能不保证跨版本可用。
 - 依赖微信一类通道的**会话窗口**：用户长时间不说话时主动推送会被平台拒收（`ret=-2 prepare failed`），这是平台限制，不是脚本故障。
